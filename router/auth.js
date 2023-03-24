@@ -26,14 +26,33 @@ router.put(
 		body('repeatPassword', 'Passwords do not match.').custom(
 			(value, { req }) => {
 				if (value !== req.body.password) {
-					return Promise.reject('Passwords do not match.');
+					return Promise.reject('Passwords has to be the same');
 				}
 				return true;
 			}
 		),
-		body('name', `name field can not be empty`).trim().not().isEmpty(),
+		body('name', `Name field can not be empty`).trim().not().isEmpty(),
 	],
 	authController.signup
+);
+
+router.post(
+	'/login',
+	[
+		body('email', 'Please enter a valid email.')
+			.isEmail()
+			.normalizeEmail()
+			.trim()
+			.custom((value, { req }) => {
+				return User.findOne({ email: value }).then((userDoc) => {
+					if (!userDoc) {
+						return Promise.reject('User with this email does not exist');
+					}
+				});
+			}),
+		body('password', 'This field can not be empty').trim().not().isEmpty(),
+	],
+	authController.login
 );
 
 module.exports = router;
