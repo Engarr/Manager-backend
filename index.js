@@ -22,6 +22,14 @@ app.use((req, res, next) => {
 
 app.use('/auth', authRoutes);
 
+app.use((error, req, res, next) => {
+	console.log(error);
+	const status = error.satusCode || 500;
+	const message = error.message;
+	const data = error.data;
+	res.status(status).json({ message: message, data: data });
+});
+
 mongoose
 	.connect(
 		`mongodb+srv://Lukasz:${process.env.MONGOOSE_PASS}@cluster0.k4a8s6m.mongodb.net/manager?retryWrites=true`
